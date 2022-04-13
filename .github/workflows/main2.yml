@@ -76,6 +76,15 @@ jobs:
           
       - name: was-deploy restart
         run: kubectl rollout restart deployment/was
+        
+      - uses: convictional/gcp-storage-action@master
+        with:
+          source_file:  ./build/libs/*.war
+          destination_file: gs://wonz/test/
+          application_credentials: ${{ secrets.GCP_STG_KEY }}
+          project_id: coherent-bay-343008
+
+        
 
 
 
