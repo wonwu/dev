@@ -20,6 +20,14 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3
 
+      - name: Get current time
+        uses: gerred/actions/current-time@master
+        id: current-time
+
+      # docker push시 사용할 환경변수
+#       - name: set env
+#         run : echo "RELEASE_VERSION=${GITHUB_RUN_NUMBER}" >> $GITHUB_ENV
+
       # Runs a single command using the runners shell
       - name: ls
         run: ls -al
@@ -64,7 +72,12 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
           
       - name: docker push
-        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/m-dev:tomcat_latest
+        run: |
+          #docker push ${{ secrets.DOCKERHUB_USERNAME }}/m-dev:tomcat_${{ env.RELEASE_VERSION}}
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/m-dev:tomcat_$TIME
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/m-dev:tomcat_latest
+        env:
+          TIME: "${{ steps.current-time.outputs.time }}"
         
       - name: Get GKE Credentials
         uses: google-github-actions/get-gke-credentials@v0.7.0
@@ -76,22 +89,21 @@ jobs:
           
       - name: was-deploy restart
         run: kubectl rollout restart deployment/was
-        
-      - name: Get current time
-        uses: gerred/actions/current-time@master
-        id: current-time
           
       - name: rename file
         run: mv ./build/libs/*.war ./build/libs/$TIME.war
         env:
           TIME: "${{ steps.current-time.outputs.time }}"
-          
-      - uses: convictional/gcp-storage-action@master
+       
+      - name : gcp cloud storage backup
+        uses: convictional/gcp-storage-action@master
         with:
           source_file:  ./build/libs/*.war
           destination_file: gs://wonz/test/
           application_credentials: ${{ secrets.GCP_STG_KEY }}
           project_id: coherent-bay-343008
+          
+
 
 
 
