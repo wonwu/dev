@@ -73,6 +73,10 @@ jobs:
           location: us-central1-c
           project_id: coherent-bay-343008
           credentials: ${{ secrets.GCP_SA_KEY }}
+          
+      - name: was-deploy restart
+        run: kubectl rollout restart deployment/was
+
 
 
      
