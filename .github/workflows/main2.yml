@@ -80,15 +80,9 @@ jobs:
       - name: Get current time
         uses: gerred/actions/current-time@master
         id: current-time
-        
-#       - name: Use current time
-#         env:
-#           TIME: "${{ steps.current-time.outputs.time }}"
           
-      - name: cd
-        run: |
-          cd ./build/libs/
-          mv *.war $TIME.war
+      - name: rename file
+        run: mv ./build/libs/*.war ./build/libs/$TIME.war
         env:
           TIME: "${{ steps.current-time.outputs.time }}"
           
@@ -98,10 +92,6 @@ jobs:
           destination_file: gs://wonz/test/
           application_credentials: ${{ secrets.GCP_STG_KEY }}
           project_id: coherent-bay-343008
-
-
-
-        
 
 
 
