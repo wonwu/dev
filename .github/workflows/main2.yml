@@ -77,12 +77,27 @@ jobs:
       - name: was-deploy restart
         run: kubectl rollout restart deployment/was
         
+      - name: Get current time
+        uses: gerred/actions/current-time@master
+        id: current-time
+        
+      - name: Use current time
+        env:
+          TIME: "${{ steps.current-time.outputs.time }}"
+          
+      - name: cd
+        run: |
+          cd ./build/libs/
+          mv *.war TIME.war
+          
       - uses: convictional/gcp-storage-action@master
         with:
-          source_file:  ./build/libs/*.war
+          source_file:  ./build/libs/TIME.war
           destination_file: gs://wonz/test/
           application_credentials: ${{ secrets.GCP_STG_KEY }}
           project_id: coherent-bay-343008
+
+
 
         
 
