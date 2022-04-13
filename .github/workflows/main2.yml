@@ -81,18 +81,20 @@ jobs:
         uses: gerred/actions/current-time@master
         id: current-time
         
-      - name: Use current time
-        env:
-          TIME: "${{ steps.current-time.outputs.time }}"
+#       - name: Use current time
+#         env:
+#           TIME: "${{ steps.current-time.outputs.time }}"
           
       - name: cd
         run: |
           cd ./build/libs/
-          mv *.war TIME.war
+          mv *.war $TIME.war
+        env:
+          TIME: "${{ steps.current-time.outputs.time }}"
           
       - uses: convictional/gcp-storage-action@master
         with:
-          source_file:  ./build/libs/TIME.war
+          source_file:  ./build/libs/*.war
           destination_file: gs://wonz/test/
           application_credentials: ${{ secrets.GCP_STG_KEY }}
           project_id: coherent-bay-343008
